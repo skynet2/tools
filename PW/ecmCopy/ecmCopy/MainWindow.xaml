@@ -1,0 +1,34 @@
+﻿<Controls:MetroWindow x:Class="ecmCopy.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
+
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="CopyME" Height="390" Width="775.132">
+    <Grid>
+        <RichTextBox x:Name="EcmRichTextBox" x:FieldModifier="public" HorizontalAlignment="Left" Height="197" Margin="10,90,0,0" VerticalAlignment="Top" Width="498">
+            <FlowDocument>
+                <Paragraph>
+                    <Run Text="models\weapons\人物\初始武器\木棍\木棍.ecm"/>
+                </Paragraph>
+            </FlowDocument>
+        </RichTextBox>
+        <TextBox x:Name="FromTextBox" x:FieldModifier="public" HorizontalAlignment="Left" Height="23" Margin="88,10,0,0" TextWrapping="Wrap" Text="C:\chinaPW\element" VerticalAlignment="Top" Width="373"/>
+        <TextBox x:Name="ToTextBox" x:FieldModifier="public" HorizontalAlignment="Left" Height="23" Margin="88,38,0,0" TextWrapping="Wrap" Text="C:\result002" VerticalAlignment="Top" Width="373"/>
+        <ProgressBar x:Name="ProgressBar1" x:FieldModifier="public" HorizontalAlignment="Left" Height="25" Margin="10,292,0,0" VerticalAlignment="Top" Width="498"/>
+        <Button HorizontalAlignment="Left" Margin="10,322,0,0" VerticalAlignment="Top" Width="498" Height="30" Click="Button_Click" Content="Start"/>
+        <CheckBox x:Name="PckCheckBox" x:FieldModifier="public" Content="From [*.pck.files]" HorizontalAlignment="Left" Margin="10,67,0,0" VerticalAlignment="Top"/>
+        <CheckBox x:Name="DestCheckBox" x:FieldModifier="public" Content="To [*.pck.files]" HorizontalAlignment="Left" Margin="151,67,0,0" VerticalAlignment="Top"/>
+        <RichTextBox x:Name="LogBox" x:FieldModifier="public" HorizontalAlignment="Left" Height="342" Margin="513,10,0,0" VerticalAlignment="Top" Width="246" IsReadOnly="True">
+            <FlowDocument>
+                <Paragraph>
+                    <Run Text=""/>
+                </Paragraph>
+            </FlowDocument>
+        </RichTextBox>
+        <Label Content="Copy from" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+        <Label Content="Copy to" HorizontalAlignment="Left" Margin="10,36,0,0" VerticalAlignment="Top"/>
+        <Button Content="..." HorizontalAlignment="Left" Margin="466,10,0,0" VerticalAlignment="Top" Width="42" Click="Button_Click_1"/>
+        <Button Content="..." HorizontalAlignment="Left" Margin="466,39,0,0" VerticalAlignment="Top" Width="42" Click="Button_Click_2"/>
+
+    </Grid>
+</Controls:MetroWindow>
