@@ -1,6 +1,3 @@
-package Structures;
-
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -9,10 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by io on 13.10.14.
+ * Created by io on 23.02.2015.
  */
-public class ConfigList
-{
+public class ConfigList {
     public String Name;
     public Type[] Types;
     public ConfigList (String name,String values,String types)
@@ -26,7 +22,7 @@ public class ConfigList
             Types[i] = new Type(vals[i],tty[i]);
     }
     public static List<ConfigList> ParseList(String path) throws IOException {
-        List<ConfigList> lists = new ArrayList<>();
+        List<ConfigList> lists = new ArrayList<ConfigList>();
         List<String> args = Files.readAllLines(Paths.get(path), Charset.defaultCharset());
         for(int i = 2; i<=args.size()-2; i+=5)
         {
