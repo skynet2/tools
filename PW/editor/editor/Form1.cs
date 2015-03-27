@@ -6,6 +6,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net.Mail;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -23,7 +24,67 @@ namespace editor
         public static Dictionary<string, string> GetVals;
         public static GlobalSelector _globalSelector;
         public static SurfacesChanger _SurfacesChanger;
+        public static Dictionary<string, HashSet<string>> Bonus4Page { get; set; }
+        public static Dictionary<string, HashSet<string>> Bonus7Page { get; set; }
+        public static Dictionary<string, HashSet<string>> Bonus10Page { get; set; }
+        public static void LoadDicts()
+        {
+            Bonus4Page = LoadDict("bonuses4list.txt");
+            Bonus7Page = LoadDict("bonuses7list.txt");
+            Bonus10Page = LoadDict("bonuses10list.txt");
+        }
 
+        public static string GetBonus(int list,string bonusid)
+        {
+            try
+            {
+                Dictionary<string, HashSet<string>> temp = null;
+                switch (list)
+                {
+                    case 4:
+                        temp = Bonus4Page;
+                        break;
+                    case 7:
+                        temp = Bonus7Page;
+                        break;
+                    case 10:
+                        temp = Bonus10Page;
+                        break;
+                }
+                foreach (var it in temp)
+                {
+                    foreach (var val in it.Value)
+                    {
+                        if (val == bonusid)
+                            return it.Key;
+                    }
+                }
+                return "";
+            }
+            catch (Exception)
+            {
+                return "";
+            }
+
+        }
+        public static Dictionary<string, HashSet<string>> LoadDict(string path)
+        {
+            var temp = new Dictionary<string, HashSet<string>>();
+            string[] vals = File.ReadAllLines(path, Encoding.UTF8);
+            for (int i = 0; i < vals.Length; i++)
+            {
+                string tt = vals[i++];
+                var ttt = vals[i].Split(',');
+                if(!temp.ContainsKey(tt))
+                    temp.Add(tt,new HashSet<string>(ttt));
+                else
+                    foreach (var it in ttt)
+                    {
+                        temp[tt].Add(it);
+                    }
+            }
+            return temp;
+        }
         public Form1()
         {
             InitializeComponent();
@@ -32,13 +93,17 @@ namespace editor
             dataGridView1.Columns.Add("Test", "header");
             var priva = dataGridView1.Columns["Test"];
             if (priva != null) priva.ReadOnly = true;
-            dataGridView1.Columns.Add("Value", "Values");
+            var column = new DataGridViewTextBoxColumn() { Name = "Value", HeaderText = "Значения", Width = 165 };
+            var column1 = new DataGridViewTextBoxColumn() { Name = "Decrypt", HeaderText = "Разшифровка", Width = 100 };
+            dataGridView1.Columns.Add(column);
+            dataGridView1.Columns.Add(column1);
             Helper.LoadSurfaces();
             listBox1.SelectionMode = SelectionMode.MultiExtended;
             listBox1.MouseDown += listBox1_MouseClick;
             numericUpDown1.Maximum = int.MaxValue;
             numericUpDown1.Minimum = 0;
             textBox3.MouseDoubleClick += textBox3_MouseDoubleClick;
+            LoadDicts();
             CheckForIllegalCrossThreadCalls = false;
         }
 
@@ -123,6 +188,7 @@ namespace editor
                 }
             }
             ListBoxRepaint(true);
+            listBox1.SelectedItem = listBox1.Items[listBox1.Items.Count - 1];
         }
 
         private void AddItems(Item old)
@@ -135,6 +201,7 @@ namespace editor
         private static Dictionary<short, string> _versions = new Dictionary<short, string>(); 
         private void откритьToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            Page55._55Holders = null;
             foreach (var vv in Directory.GetFiles(Path.Combine(Directory.GetCurrentDirectory(),"configs"),"*v*.*",SearchOption.AllDirectories))
             {
                 var name = Path.GetFileName(vv);
@@ -178,6 +245,13 @@ namespace editor
             label1.Text = string.Format("Кол-во итемов - {0}", listBox1.Items.Count);
         }
 
+        private DataGridView GenerateGrid(string name)
+        {
+            var grid1 = new DataGridView() { Name = name, Width = (tabControl1.Width - 5), Height = tabControl1.Height };
+            for (int i = 0; i < 3; i++)
+                grid1.Columns.Add(i.ToString(), i.ToString());
+            return grid1;
+        }
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (listBox1.SelectedIndex == -1)
@@ -200,10 +274,53 @@ namespace editor
                 textBox3.Text = "";
             }
                         
-            if((comboBox1.SelectedIndex+1) == 55)
+            if(GetCurrentList() == 55)
             {
                 Page55 pp = new Page55();
                 pp.SetValues55(ref tabControl1, ref listBox1);
+                return;
+            }
+            else if (GetCurrentList() == 4 || GetCurrentList() == 7 || GetCurrentList() == 10)
+            {
+                if (tabControl1.TabPages.Count != 4)
+                {
+                    var page = new TabPage() {Name = "Addons",Text = "Addons"};
+
+                    page.Controls.Add(GenerateGrid("Grid"));
+                    var page3 = new TabPage() { Name = "Probability", Text = "Вероятности" };
+                    page3.Controls.Add(GenerateGrid("Grid"));
+                    tabControl1.TabPages.Add(page);
+                    tabControl1.TabPages.Add(page3);
+                }
+                var grid = (DataGridView)tabControl1.TabPages["Addons"].Controls["Grid"];
+                var grid2 = (DataGridView)tabControl1.TabPages["Probability"].Controls["Grid"];
+                grid.Rows.Clear();
+                grid2.Rows.Clear();
+                var values = ((Item) listBox1.SelectedItem).Values;
+                for(int i = 0; i < values.Length/2 ; i++)
+                {
+                    var row = (DataGridViewRow)dataGridView1.Rows[0].Clone();
+                    row.Cells[0].Value = values[i, 0];
+                    row.Cells[1].Value = values[i, 1];
+                    if (((string) values[i, 0]).Contains("file_icon"))
+                        continue;
+                    if (((string) values[i, 0]).Contains("addons"))
+                    {
+                        row.Cells[2].Value = GetBonus(GetCurrentList(),row.Cells[1].Value.ToString());
+                        grid.Rows.Add(row);
+                    } else if (((string) values[i, 0]).Contains("probability"))
+                    {
+                        grid2.Rows.Add(row);
+
+                    }
+                    else
+                    {
+                        dataGridView1.Rows.Add(row);
+                    }
+                }
+                grid.CellValueChanged += dataGridView1_CellValueChanged;
+                grid2.CellValueChanged += dataGridView1_CellValueChanged;
+                dataGridView1.Rows.RemoveAt(0);
                 return;
             }
             else if(tabControl1.TabPages.Count > 2)
@@ -244,6 +361,7 @@ namespace editor
             numericUpDown1.ValueChanged +=numericUpDown1_ValueChanged;
             GetConnections();
         }
+
 
         void dataGridView1_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
@@ -308,9 +426,14 @@ namespace editor
         {
             foreach (Item it in listBox1.SelectedItems)
             {
-                it.SetByKey((string)dataGridView1[0, e.RowIndex].Value, dataGridView1[1, e.RowIndex].Value);
+                it.SetByKey((string)((DataGridView)sender)[0, e.RowIndex].Value, ((DataGridView)sender)[1, e.RowIndex].Value);
+                if (tabControl1.SelectedTab.Name == "Addons")
+                {
+                    int list = GetCurrentList();
+                    DataGridViewCell row = ((DataGridView)sender)[1, e.RowIndex];
+                    ((DataGridView)sender)[2, e.RowIndex].Value = GetBonus(list,row.Value.ToString());
+                }
             }
-         //   MessageBox.Show(string.Format("Column : {0}\n Row : {1}", e.ColumnIndex, e.RowIndex));
         }
 
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)

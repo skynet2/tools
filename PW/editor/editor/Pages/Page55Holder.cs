@@ -28,8 +28,10 @@ namespace editor.Pages
             public static bool Drowed { get; set; }
         public void SetValues55(ref TabControl tabControl1, ref ListBox listBox1)
         {
-            if(_55Holders == null)
+            if (_55Holders == null)
+            {
                 Make55Page(ref tabControl1, ref listBox1);
+            }
             int i = 0;
             Item it = (Item)listBox1.SelectedItem;
             for (int k = 0; k < 8; k++)
