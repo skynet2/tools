@@ -105,8 +105,8 @@ namespace editor.Pages
                         Name = "pan"
                     };
                     var name = new TextBox() { Width = 390, Name = "NameBox"+i };
-                    var skill = new TextBox() {Width = 150, Name = "Skill"};
-                    var deskSkill = new Label() {Width = 200, Name = "SkillDesk_" + i};
+                    var skill = new TextBox() {Width = 30, Name = "Skill", BackColor = Color.DarkOrange};
+                    var deskSkill = new Label() { Width = 320, Name = "SkillDesk_" + i, Text = "158 Кузнец || 159 Портной || 160 Ремесленник || 161 Аптекарь" };
                     var type = new TextBox() {Width = 30, Name = "Type_" + i};
                     var typeD = new Label() {Width = 320,Text = "Тип крафта : 1 - перетянуть, 3 - регрейд, 4 - дух стихий"};
                     pan.Controls.Add(name);
@@ -120,7 +120,7 @@ namespace editor.Pages
                         _55Holders.Add(new Page55Holder()
                         {
                             pict = new PictureBox() { Height = 32, Width = 32, BackColor = Color.Black , WaitOnLoad = true},
-                            text = new TextBox() { Width = 34 , Name = "Value" + i+"_"+z},
+                            text = new TextBox() { Width = 34, Name = "Value" + i + "_" + z, BackColor = Color.DarkOrange },
                             Skill = skill,
                             Produce = type,
                             Desk = deskSkill,

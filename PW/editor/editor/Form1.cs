@@ -138,6 +138,7 @@ namespace editor
 
         void m_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
+            bool do_smth = false;
             switch (e.ClickedItem.Text)
             {
                 case "Удалить":
@@ -154,7 +155,8 @@ namespace editor
                     foreach (var ss in listBox1.SelectedItems)
                     {
                         AddItems((Item)ss);
-                    }                    
+                    }
+                    do_smth = true;
                     break;
                 }
                 case "Импорт":
@@ -169,8 +171,7 @@ namespace editor
                         Item it = JsonConvert.DeserializeObject<Item>(File.ReadAllText(file, Encoding.UTF8));
                         Helper._elReader.AddItem(list, it);
                     }
-                    listBox1.SelectedIndex = listBox1.Items.Count - 1;
-
+                    do_smth = true;
                     break;
                 }
                 case "Экспорт":
@@ -187,8 +188,7 @@ namespace editor
                     break;
                 }
             }
-            ListBoxRepaint(true);
-            listBox1.SelectedItem = listBox1.Items[listBox1.Items.Count - 1];
+            ListBoxRepaint(true,do_smth);
         }
 
         private void AddItems(Item old)
@@ -236,7 +236,7 @@ namespace editor
             if (SelectedIndex == -1)
                 return;
             SelectedIndex = comboBox1.SelectedIndex;
-            ListBoxRepaint();
+            ListBoxRepaint(false,false);
             SetInfo();
         }
 
@@ -280,10 +280,27 @@ namespace editor
                 pp.SetValues55(ref tabControl1, ref listBox1);
                 return;
             }
-            else if (GetCurrentList() == 4 || GetCurrentList() == 7 || GetCurrentList() == 10)
+            Page55._55Holders = null;
+
+            if (tabControl1.TabPages["Value"] == null)
             {
-                if (tabControl1.TabPages.Count != 4)
+                tabControl1.TabPages.Clear();
+                var page = new TabPage();
+                page.Controls.Add(dataGridView1);
+                page.Name = "Value";
+                page.Text = "Значения";
+                tabControl1.TabPages.Add(page);
+                var page2 = new TabPage();
+                page2.Controls.Add(listBox2);
+                page2.Text = "Связи";
+                tabControl1.TabPages.Add(page2);
+                listBox1.SelectionMode = SelectionMode.MultiExtended;
+            }
+            if (GetCurrentList() == 4 || GetCurrentList() == 7 || GetCurrentList() == 10)
+            {
+                if (tabControl1.TabPages["Addons"] == null)                
                 {
+                    //tabControl1.TabPages.Clear();
                     var page = new TabPage() {Name = "Addons",Text = "Addons"};
 
                     page.Controls.Add(GenerateGrid("Grid"));
@@ -323,19 +340,7 @@ namespace editor
                 dataGridView1.Rows.RemoveAt(0);
                 return;
             }
-            else if(tabControl1.TabPages.Count > 2)
-            {
-                tabControl1.TabPages.Clear();
-                var page = new TabPage();
-                page.Controls.Add(dataGridView1);
-                page.Text = "Значения";
-                tabControl1.TabPages.Add(page);
-                var page2 = new TabPage();
-                page2.Controls.Add(listBox2);
-                page2.Text = "Связи";
-                tabControl1.TabPages.Add(page2);
-                listBox1.SelectionMode = SelectionMode.MultiExtended;
-            }
+
             for(int i = 2; i < cl.Values.Length/2; i++)
             {
                 
@@ -414,12 +419,14 @@ namespace editor
         {
             return int.Parse(((KeyValuePair<string, Item[]>) comboBox1.SelectedItem).Key.Split(' ')[0]);
         }
-        private void ListBoxRepaint(bool full = false)
+        private void ListBoxRepaint(bool full ,bool do_smth)
         {
                 if (full)
                     listBox1.DataSource = null;
                 listBox1.DataSource = Helper._elReader.Items.ElementAt(SelectedIndex).Value;
                 listBox1.DisplayMember = "EditorView";
+            if(do_smth)
+                listBox1.SelectedItem = listBox1.Items[listBox1.Items.Count - 1];;
         }
 
         void dataGridView1_CellValueChanged(object sender, DataGridViewCellEventArgs e)
@@ -462,7 +469,7 @@ namespace editor
             {
                 AddItems(tt);
             }
-            ListBoxRepaint();
+            ListBoxRepaint(false,false);
         }
 
         private void textBox3_TextChanged(object sender, EventArgs e)
