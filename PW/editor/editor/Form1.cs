@@ -347,8 +347,15 @@ namespace editor
             var id = Helper.FindCoord(textBox3.Text);
             if (Helper._cropped != null && Helper._cropped.ContainsKey(Path.GetFileName(textBox3.Text)) &&
                 textBox3.Text != "")
+            {
                 pictureBox1.Image = Helper._cropped[Path.GetFileName(textBox3.Text)];
+                foreach (Item item in listBox1.SelectedItems)
+                {
+                    item.SetByKey("file_icon",((TextBox)sender).Text);
+                }
+            }
             else pictureBox1.Image = null;
+
         }
 
         private void сохранитьToolStripMenuItem_Click(object sender, EventArgs e)
