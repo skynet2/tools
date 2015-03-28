@@ -30,6 +30,7 @@ namespace pwApi.StructuresElement
         }
         public void Save(BinaryWriter bw, ConfigList ls)
         {
+
             for (int i = 0; i < Values.Length / 2; i++)
             {
                 var type = ls.Types[i];
@@ -42,6 +43,12 @@ namespace pwApi.StructuresElement
                         break;
                     case "string:":
                         bw.Write(UtilsIO.GenerateArray(Encoding.GetEncoding(936).GetBytes(Values[i, 1]), type.Size));
+                        break;
+                    case "int32":
+                        bw.Write(Convert.ToInt32(Values[i, 1]));
+                        break;
+                    case "float":
+                        bw.Write(Convert.ToSingle(Values[i, 1]));
                         break;
                     default:
                         bw.Write(Values[i, 1]);
@@ -100,12 +107,12 @@ namespace pwApi.StructuresElement
                     case "string:":
                         vvv[i, 0] = tt.Name;
                         vvv[i, 1] = Encoding.GetEncoding(936)
-                            .GetString(br.ReadBytes(tt.Size)).Replace("\0", "");
+                            .GetString(br.ReadBytes(tt.Size));
                         break;
                     case "wstring:":
                         vvv[i, 0] = tt.Name;
                         vvv[i, 1] = Encoding.Unicode.GetString(
-                            br.ReadBytes(tt.Size)).Replace("\0","");
+                            br.ReadBytes(tt.Size));
                         break;
                     case "float":
                         vvv[i, 0] = tt.Name;
