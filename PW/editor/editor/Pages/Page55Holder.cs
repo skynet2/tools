@@ -168,7 +168,7 @@ namespace editor.Pages
 
         static void Produce_TextChanged(object sender, EventArgs e)
         {
-            if (Drowed)
+            if(Drowed || ((Item)Program.f.listBox1.SelectedItem).GetByKey("produce_type") == null)
                 return;
             ((Item)Program.f.listBox1.SelectedItem).SetByKey("produce_type", ((TextBox)sender).Text);
         }
