@@ -12,7 +12,7 @@ namespace pwApi.Readers
     {
         public Dictionary<string, Item[]> Items { get; set; }
         private readonly BinaryReader _br;
-        private readonly List<ConfigList> _confList;
+        private readonly ConfigLists _confList;
         public HashSet<int> ExistingId;
         private string _path;
         // SAVERS
@@ -21,32 +21,38 @@ namespace pwApi.Readers
         public ElementReader(string configPath, string elementPath)
         {
             _path = elementPath;
-            _confList = ConfigList.ParseList(configPath);
+            _confList = new ConfigLists();
+            _confList.ParseList(configPath);
             Items = new Dictionary<string, Item[]>();
             _br = new BinaryReader(File.OpenRead(elementPath));
             _somevals = new Dictionary<byte, List<byte[]>>();
-            var bb = new List<byte[]> { _br.ReadBytes(8) };
-            _somevals.Add(0, bb);
+            var bb = new List<byte[]> { _br.ReadBytes(4) };
+            _somevals.Add(255, bb);
 
-            for (var i = 0; i < _confList.Count; i++)
+            for (byte i = 0; i < _confList.Lists.Count; i++)
             {
-                switch (i)
+                if(i != _confList.NpcTalk)
                 {
-                    case 20:
-                        _somevals.Add(Convert.ToByte(i), Offset20());
-                        Items.Add(_confList[i].Name, List(i));
-                        break;
-                    case 58:
-                        _somevals.Add(Convert.ToByte(i), List58());
-                        break;
-                    case 100:
-                        _somevals.Add(Convert.ToByte(i), Offset100());
-                        Items.Add(_confList[i].Name, List(i));
-                        break;
-                    default:
-                        Items.Add(_confList[i].Name, List(i));
-                        break;
+                    if(_confList.Lists[i].Skip != "0" && _confList.Lists[i].Skip != "AUTO")
+                        _somevals[i] = new List<byte[]>{_br.ReadBytes(int.Parse(_confList.Lists[i].Skip))};
+                    else if(_confList.Lists[i].Skip == "AUTO")
+                    {
+                        _somevals[i] = new List<byte[]> { _br.ReadBytes(4) };
+                        var count = _br.ReadInt32();
+                        _somevals[i].Add(IntToByte(count));
+                        _somevals[i].Add(_br.ReadBytes(count));
+                        count = _br.ReadInt32();
+                        while(count <= 0 || count > 10000)
+                        {
+                            _somevals[i].Add(IntToByte(count));
+                            count = _br.ReadInt32();
+                        }
+                        _br.BaseStream.Position -= 4;
+                    }
+                    Items.Add(_confList.Lists[i].Name, List(i));
                 }
+                else
+                    _somevals.Add(Convert.ToByte(i), List58());
             }
             Console.WriteLine(Process.GetCurrentProcess().WorkingSet64);
             Console.WriteLine((GC.GetTotalMemory(true) / 1024f) / 1024f);
@@ -92,17 +98,8 @@ namespace pwApi.Readers
             var count = _br.ReadInt32();
             var items = new Item[count];
             for (var z = 0; z < count; z++)
-                items[z] = Item.ParseItem(_confList[i], _br);
+                items[z] = Item.ParseItem(_confList.Lists[i], _br);
             return items;
-        }
-
-        private List<byte[]> Offset100()
-        {
-            var off100 = new List<byte[]> { _br.ReadBytes(4) };
-            var count = _br.ReadInt32();
-            off100.Add(IntToByte(count));
-            off100.Add(_br.ReadBytes(count));
-            return off100;
         }
 
         private List<byte[]> List58()
@@ -259,32 +256,26 @@ namespace pwApi.Readers
         {
             if (newPath == null) newPath = _path;
             var bw = new BinaryWriter(File.OpenWrite(newPath));
-            WriteList(bw, _somevals[0]);
-            var l58 = _confList[58];
-            _confList.Remove(l58);
-            for (int i = 0; i < Items.Keys.Count; i++)
+            WriteList(bw, _somevals[255]);
+            for(byte i = 0; i < _confList.Lists.Count; i++)
             {
-                if (i == 20)
+                if(i < 255 && i != _confList.NpcTalk && _somevals.ContainsKey(i))
                 {
-                    WriteList(bw, _somevals[20]);
+                    WriteList(bw, _somevals[i]);
                 }
-                if (i == 58)
+                if(i == _confList.NpcTalk)
                 {
-                    WriteList(bw, _somevals[58]);
-                }
-                if (i == 99)
-                {
-                    WriteList(bw, _somevals[100]);
+                    WriteList(bw, _somevals[_confList.NpcTalk]);
+                    continue;
                 }
                 var keys = Items.Keys;
-                var currentKey = keys.ElementAt(i);
+                var currentKey = keys.ElementAt(i > _confList.NpcTalk ? i - 1: i);
                 bw.Write(Items[currentKey].Length);
                 foreach (var item in Items[currentKey])
                     if(item != null)
-                        item.Save(bw, _confList[i]);
+                        item.Save(bw, _confList.Lists[i]);
 
             }
-            _confList.Insert(58, l58);
             bw.Close();
 
         }

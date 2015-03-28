@@ -53,7 +53,8 @@ namespace editor.Pages
                     _55Holders[i].text.Text = it.Values[z, 1].ToString();
                     _55Holders[i].it = it;
                     _55Holders[i].Skill.Text = it.GetByKey("id_make_skill").ToString();
-                    _55Holders[i].Produce.Text = it.GetByKey("produce_type").ToString();
+                    if(it.GetByKey("produce_type") != null)
+                        _55Holders[i].Produce.Text = it.GetByKey("produce_type").ToString();
                     var val = it.Values[z, 1];
                     if (Convert.ToInt32(it.Values[z, 1]) != 0)
                     {

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 
 namespace pwApi.StructuresElement
@@ -7,26 +6,40 @@ namespace pwApi.StructuresElement
     public class ConfigList
     {
         public string Name;
+        public string Skip;
         public Type[] Types;
-        public ConfigList(String name, String values, String types)
+
+        public ConfigList(string name, string skip, string values, string types)
         {
             Name = name;
+            Skip = skip;
             var vals = values.Split(';');
             var tty = types.Split(';');
             Types = new Type[vals.Length];
-
-            for (int i = 0; i < vals.Length; i++)
+            for(var i = 0; i < vals.Length; i++)
                 Types[i] = new Type(vals[i], tty[i]);
         }
-        public static List<ConfigList> ParseList(String path)
+    }
+
+    public class ConfigLists
+    {
+        public byte NpcTalk;
+        public List<ConfigList> Lists;
+
+        public void ParseList(string path)
         {
-            List<ConfigList> lists = new List<ConfigList>();
+            Lists = new List<ConfigList>();
             var args = File.ReadAllLines(path);
-            for (int i = 2; i <= args.Length - 2; i += 5)
+            var count = int.Parse(args[0]);
+            NpcTalk = byte.Parse(args[1]);
+            var line = 2;
+            for(var i = 0; i < count; i++)
             {
-                lists.Add(new ConfigList(args[i + 1], args[i + 3], args[i + 4]));
+                while(args[line] == "")
+                    line++;
+                Lists.Add(new ConfigList(args[line], args[line + 1], args[line + 2], args[line + 3]));
+                line += 4;
             }
-            return lists;
         }
     }
 }
