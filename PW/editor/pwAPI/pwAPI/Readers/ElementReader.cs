@@ -196,7 +196,7 @@ namespace pwApi.Readers
             }
             Items[GetListKey(list)] = arr;
         }
-        public string GetIcon(int recepie)
+        public string GetIcon70(int recepie)
         {
             Item it = FindInList(70, recepie);
             if (it == null)
@@ -213,7 +213,23 @@ namespace pwApi.Readers
                     return kk;
             }
             return null;
+        }
 
+        public string GetIcon(int item)
+        {
+            if (item == 0)
+                return "";
+            for(int i = 3 ; i <= Items.Count; i++)
+        //    foreach (var page in Items)
+            {
+                var page = Items.ElementAt(i);
+                foreach (Item it in page.Value)
+                {
+                    if (Convert.ToInt32(it.GetByKey("ID")) == item)
+                        return it.GetByKey("file_icon");
+                }
+            }
+            return "";
         }
         private static void PrintInfo(Item i)
         {

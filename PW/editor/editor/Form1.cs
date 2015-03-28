@@ -25,7 +25,7 @@ namespace editor
         public static GlobalSelector _globalSelector;
         public static AddonSelector _AddonsSelector;
         public static SurfacesChanger _SurfacesChanger;
-
+        public static ItemSelector _ItemSelector;
         public static void LoadDicts()
         {
             Helper.Bonus4Page = LoadDict("bonuses4list.txt");
@@ -56,11 +56,12 @@ namespace editor
             InitializeComponent();
             dataGridView1.AutoGenerateColumns = false;
             dataGridView1.AllowUserToAddRows = false;
-            dataGridView1.Columns.Add("Test", "header");
+            var column0 = new DataGridViewTextBoxColumn() { Name = "Test", HeaderText = "header", Width = 165};
+            dataGridView1.Columns.Add(column0);
             var priva = dataGridView1.Columns["Test"];
             if (priva != null) priva.ReadOnly = true;
-            var column = new DataGridViewTextBoxColumn() { Name = "Value", HeaderText = "Значения", Width = 165 };
-            var column1 = new DataGridViewTextBoxColumn() { Name = "Decrypt", HeaderText = "Расшифровка", Width = 100 };
+            var column = new DataGridViewTextBoxColumn() { Name = "Value", HeaderText = "Значения", Width = 165};
+            var column1 = new DataGridViewTextBoxColumn() { Name = "Decrypt", HeaderText = "Расшифровка", Width = 100};
             dataGridView1.Columns.Add(column);
             dataGridView1.Columns.Add(column1);
             Helper.LoadSurfaces();
@@ -77,7 +78,7 @@ namespace editor
 
         void textBox3_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-         //   if(_SurfacesChanger == null)
+            if(_SurfacesChanger == null)
                 _SurfacesChanger = new SurfacesChanger();
             if (!SurfacesChanger.Opened)
             {
@@ -162,7 +163,7 @@ namespace editor
         {
             var oldIt = old;
             var newIt = UtilsIO.DeepClone(oldIt);
-            Helper._elReader.AddItem((comboBox1.SelectedIndex + 1), newIt);
+            Helper._elReader.AddItem(GetCurrentList(), newIt);
         }
 
         private void откритьToolStripMenuItem_Click(object sender, EventArgs e)
@@ -206,13 +207,47 @@ namespace editor
 
         private DataGridView GenerateGrid(string name)
         {
-            var grid1 = new DataGridView() { Name = name, Width = (tabControl1.Width - 5), Height = tabControl1.Height };
+            dataGridView1.AutoGenerateColumns = false;
+            dataGridView1.AllowUserToAddRows = false;
+
+            var grid1 = new DataGridView()
+            {
+                Name = name, Width = (tabControl1.Width - 5), Height = tabControl1.Height, AllowUserToAddRows = false, AllowUserToDeleteRows = false,
+                AutoGenerateColumns = false
+            };
             for (int i = 0; i < 3; i++)
-                grid1.Columns.Add(i.ToString(), i.ToString());
+            {
+                var column = new DataGridViewTextBoxColumn() { Name = i.ToString(), HeaderText = i.ToString(), Width = 165 };
+                grid1.Columns.Add(column);
+            }
+                
             grid1.Columns[1].ReadOnly = true;
             grid1.Columns[2].ReadOnly = true;
             return grid1;
         }
+        private DataGridView GenerateGrid70(string name)
+        {
+            var grid1 = new DataGridView()
+            {
+                Name = name,
+                Width = (tabControl1.Width - 5),
+                Height = tabControl1.Height,
+                AllowUserToAddRows = false,
+                AllowUserToDeleteRows = false,
+                AutoGenerateColumns = false
+            };
+            var column0 = new DataGridViewTextBoxColumn() { Name = "params", HeaderText = "params", ReadOnly = true };
+            var column1 = new DataGridViewTextBoxColumn() {Name = "Values", HeaderText = "Значения"};
+            var column2 = new DataGridViewImageColumn() {Name = "Icon", HeaderText = "Иконка", ReadOnly = true};
+            grid1.RowTemplate.Height = 32;
+            grid1.Columns.Add(column0);
+            grid1.Columns.Add(column1);
+            grid1.Columns.Add(column2);
+
+
+            return grid1;
+        }
+
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (listBox1.SelectedIndex == -1)
@@ -223,15 +258,17 @@ namespace editor
             dataGridView1.Rows.Add(""); // temp
 
             // ID Name Surfaces
-            numericUpDown1.Value = cl.GetByKey("ID");
+            numericUpDown1.Value = Convert.ToInt32(cl.GetByKey("ID"));
             textBox1.Text = cl.GetByKey("Name");
             var surfaces = cl.GetByKey("file_icon");
             if (surfaces != null)
             {
+                textBox3.ReadOnly = false;
                 textBox3.Text = surfaces;
             }
             else
             {
+                textBox3.ReadOnly = true;
                 textBox3.Text = "";
             }
                         
@@ -256,6 +293,76 @@ namespace editor
                 page2.Text = "Связи";
                 tabControl1.TabPages.Add(page2);
                 listBox1.SelectionMode = SelectionMode.MultiExtended;
+            }
+            if (GetCurrentList() == 70)
+            {
+                if (tabControl1.TabPages["Result"] == null)
+                {
+                    tabControl1.TabPages.Clear();
+                    var page0 = new TabPage() {Name = "Root", Text = "Основная"};
+                    page0.Controls.Add(dataGridView1);
+                    var page = new TabPage() { Name = "Result", Text = "Результат" };
+                    var page2 = new TabPage() { Name = "Needs", Text = "Требования", };
+                    page.Controls.Add(GenerateGrid70("Grid"));
+                    page2.Controls.Add(GenerateGrid70("Grid"));
+                    tabControl1.TabPages.Add(page0);
+                    tabControl1.TabPages.Add(page);
+                    tabControl1.TabPages.Add(page2);
+                }
+                var grid = (DataGridView)tabControl1.TabPages["Result"].Controls["Grid"];
+                var grid2 = (DataGridView)tabControl1.TabPages["Needs"].Controls["Grid"];
+                var values = ((Item) listBox1.SelectedItem).Values;
+                dataGridView1.DataError += dataGridView1_DataError;
+                grid.Rows.Add("", "");
+                dataGridView1.Rows.Add("", "");
+                for (int i = 0; i < values.Length/2; i++)
+                {
+                    string val = (string)values[i, 0];
+
+                    if (val.Contains("file_icon") || val.Contains("ID") || val.Contains("Name"))
+                        continue;
+
+
+                    DataGridViewRow row;
+                    if((val.Contains("to_make") && val.Contains("id")) || val.Contains("materials"))
+                        row = (DataGridViewRow)grid.Rows[0].Clone();
+                    else row = (DataGridViewRow)dataGridView1.Rows[0].Clone();
+
+
+                    row.Cells[0].Value = values[i, 0];
+                    row.Cells[1].Value = values[i, 1];
+                    if (val.Contains("to_make") && val.Contains("id"))
+                    {
+                        ((DataGridViewImageCell)row.Cells[2]).Value = Helper.GetImage(Convert.ToInt32(row.Cells[1].Value),false);
+                        row.Cells[1].Style.BackColor = Color.DarkOrange;
+                        grid.Rows.Add(row);
+                    }
+                    else if (val.Contains("materials"))
+                    {
+                        if (val.Contains("id"))
+                        {
+                            row.Cells[2].Value = Helper.GetImage(Convert.ToInt32(row.Cells[1].Value), false);
+                            row.Cells[1].Style.BackColor = Color.DarkOrange;
+                        }
+                        else
+                            row.Cells[2].Value = new Bitmap(32, 32);
+                        grid2.Rows.Add(row);
+
+                    }
+                    else
+                    {
+                        dataGridView1.Rows.Add(row);
+                    }
+                }
+                grid.Rows.RemoveAt(0);
+                grid2.Rows.RemoveAt(0);
+                dataGridView1.Rows.RemoveAt(0);
+                dataGridView1.Rows.RemoveAt(0);
+                grid.CellValueChanged += grid_CellValueChanged;
+                grid2.CellValueChanged += grid_CellValueChanged;
+                grid.CellDoubleClick += gridImg_CellDoubleClick;
+                grid2.CellValueChanged += gridImg_CellDoubleClick;
+                return;
             }
             GetConnections();
             if (GetCurrentList() == 4 || GetCurrentList() == 7 || GetCurrentList() == 10)
@@ -333,6 +440,35 @@ namespace editor
         //    GetConnections();
         }
 
+        private void gridImg_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (_ItemSelector == null)
+                _ItemSelector = new ItemSelector();
+            if (!ItemSelector.Opened)
+            {
+
+                DataGridViewCell ss = ((DataGridView)sender)[e.ColumnIndex, e.RowIndex];
+                _ItemSelector.Display(ref ss);
+
+            }
+            // TODO
+        }
+
+        void grid_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        {
+            foreach (Item it in listBox1.SelectedItems)
+            {
+                it.SetByKey((string)((DataGridView)sender)[0, e.RowIndex].Value, ((DataGridView)sender)[1, e.RowIndex].Value);
+                    DataGridViewCell row = ((DataGridView)sender)[1, e.RowIndex];
+                    ((DataGridView)sender)[2, e.RowIndex].Value = Helper.GetImage(Convert.ToInt32(row.Value.ToString()),false);
+            }
+        }
+
+        void dataGridView1_DataError(object sender, DataGridViewDataErrorEventArgs e)
+        {
+            
+        }
+
         void grid_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.ColumnIndex == 0)
@@ -353,7 +489,7 @@ namespace editor
 
         void dataGridView1_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.ColumnIndex == 0)
+            if (e.ColumnIndex == 0 || e.RowIndex == -1 || e.ColumnIndex == -1)
                 return;
 
             if ((string) dataGridView1[0, e.RowIndex].Value == "proc_type")
@@ -392,7 +528,7 @@ namespace editor
             int newList;
             var list = int.Parse(sp[2].Trim());
             var id = sp[5];
-            var it = Helper.SearchItem(id, (list - 1), out newList, false, false);
+            var it = Helper.SearchItem(id, (list - 1), out newList, false, false,null);
             if (newList >= 59)
                 newList -= 1;
             Setter(newList, it);
@@ -435,15 +571,17 @@ namespace editor
         private void button2_Click(object sender, EventArgs e)
         {
             int newList = (comboBox1.SelectedIndex + 1);
-            var it = Helper.SearchItem(textBox4.Text, comboBox1.SelectedIndex, out newList, checkBox2.Checked, checkBox3.Checked);
+            var it = Helper.SearchItem(textBox4.Text, comboBox1.SelectedIndex, out newList, checkBox2.Checked, checkBox3.Checked,(Item)listBox1.SelectedItem);
             Setter(newList, it);
         }
 
         private void Setter(int newList,Item it)
         {
+            listBox1.SelectionMode = SelectionMode.One;
             if (newList != (comboBox1.SelectedIndex + 1))
                 comboBox1.SelectedIndex = (newList - 1);
             listBox1.SelectedItem = it;
+            listBox1.SelectionMode = SelectionMode.MultiExtended;
         }
 
         private void button1_Click(object sender, EventArgs e)

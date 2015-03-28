@@ -19,6 +19,12 @@ namespace editor
         public GlobalSelector()
         {
             InitializeComponent();
+            this.Closing += GlobalSelector_Closing;
+        }
+
+        void GlobalSelector_Closing(object sender, CancelEventArgs e)
+        {
+            Opened = false;
         }
 
         private DataGridViewCell cell;

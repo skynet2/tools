@@ -20,17 +20,25 @@ namespace editor
         public static List<string> _surfaces;
         public static Dictionary<string, Image> _cropped;
 
-        public static Image GetImage(int id)
+        public static Image GetImage(int id,bool is70Page = true)
         {
             try
             {
-                var path = _elReader.GetIcon(Convert.ToInt32(id));
+                string path = "";
+                if (is70Page)
+                    path = _elReader.GetIcon70(Convert.ToInt32(id));
+                else path = _elReader.GetIcon(id);
+
+                if(string.IsNullOrEmpty(path))
+                    return _cropped.ElementAt(0).Value;
+
                 path = Path.GetFileName(path.Replace("\0", ""));
                 if (_cropped.ContainsKey(path))
                     return _cropped[path];
             }
-            catch (Exception)
+            catch (Exception ex1)
             {
+                MessageBox.Show(ex1.ToString());
             }
             return _cropped.ElementAt(0).Value;
 
@@ -78,7 +86,7 @@ namespace editor
             }
             return ls;
         }
-        public static Item SearchItem(string param, int currList, out int newList, bool full , bool mat)
+        public static Item SearchItem(string param, int currList, out int newList, bool full , bool mat,Item selected)
         {
             currList++;
             newList = currList;
@@ -88,15 +96,28 @@ namespace editor
             for (int i = currList; i <= final; ++i)
             {
                 newList = i;
-                foreach (var item in _elReader.GetListById(i))
+                bool found = false;
+                foreach (Item item in _elReader.GetListById(i))
                 {
+                    if (selected != null)
+                    {
+                        if (!found)
+                        {
+                            if (item == selected)
+                            {
+                                found = true;
+                                selected = null;
+                            }
+                            continue;
+                        }
+                    }
                     if (item.GetByKey("ID").ToString() == param)
                     {   
                         return item;
                     }
                     if (!mat)
                     {
-                        if (((string) item.GetByKey("Name")).Contains(param))
+                        if (((string) item.GetByKey("Name")).Replace("\0","").Contains(param))
                         {
                             return item;
                         }

@@ -22,7 +22,7 @@ namespace editor
 
         void AddonSelector_Closing(object sender, CancelEventArgs e)
         {
-
+            Opened = false;
         }
 
         private void AddonSelector_Load(object sender, EventArgs e)

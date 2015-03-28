@@ -60,7 +60,7 @@ namespace editor.Pages
                         _55Holders[i].pict.Image =
                             Helper.GetImage(Convert.ToInt32(it.Values[z, 1]));
                     }
-                    //Graphic.GetImage(Helper._img,Helper._elReader.GetIcon(int.Parse(it.Values[z, 1].ToString())));
+                    //Graphic.GetImage(Helper._img,Helper._elReader.GetIcon70(int.Parse(it.Values[z, 1].ToString())));
                     else
                     {
                         _55Holders[i].pict.Image = Helper._cropped.ElementAt(0).Value;
@@ -120,7 +120,7 @@ namespace editor.Pages
                         _55Holders.Add(new Page55Holder()
                         {
                             pict = new PictureBox() { Height = 32, Width = 32, BackColor = Color.Black , WaitOnLoad = true},
-                            text = new TextBox() { Width = 34, Name = "Value" + i + "_" + z, BackColor = Color.DarkOrange },
+                            text = new TextBox() { Width = 37, Name = "Value" + i + "_" + z, BackColor = Color.DarkOrange },
                             Skill = skill,
                             Produce = type,
                             Desk = deskSkill,
