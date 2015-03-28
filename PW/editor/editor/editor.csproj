@@ -48,6 +48,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AddonSelector.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddonSelector.Designer.cs">
+      <DependentUpon>AddonSelector.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ElementConverter.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ElementConverter.Designer.cs">
+      <DependentUpon>ElementConverter.cs</DependentUpon>
+    </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -78,6 +90,12 @@
     <Compile Include="SurfacesChanger.Designer.cs">
       <DependentUpon>SurfacesChanger.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="AddonSelector.resx">
+      <DependentUpon>AddonSelector.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ElementConverter.resx">
+      <DependentUpon>ElementConverter.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>

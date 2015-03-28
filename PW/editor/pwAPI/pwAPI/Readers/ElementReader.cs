@@ -151,22 +151,32 @@ namespace pwApi.Readers
             Items[key] = arr;
         }
 
+        public Item GetLastInList(int list)
+        {
+            Item[] ls = GetListById(list);
+            return ls.Last();
+        }
         public Item FindInList(int listID, int id)
         {
             foreach (var it in GetListById(listID).Where(it => it.GetByKey("ID") == id))
                 return it;
             return null;
         }
-        public int AddItem(int listID, Item newItem, bool print = false)
+
+        public int AddItem(int listID, Item newItem, bool checkID = true)
         {
             if (ExistingId == null)
                 ElementUtils.GetExsistingIDs(this);
             var key = GetListKey(listID);
-            if (ExistingId.Contains(Convert.ToInt32(newItem.GetByKey("ID"))))
-                newItem.SetByKey("ID", GetFreeId());
-            if (print) PrintInfo(newItem);
-            AddItem(key, newItem);
-            return newItem.GetByKey("ID");
+            if (checkID)
+            {
+                if (ExistingId.Contains(Convert.ToInt32(newItem.GetByKey("ID"))))
+                    newItem.SetByKey("ID", GetFreeId());
+            }
+            //   if (print) PrintInfo(newItem);
+            var it = ElementUtils.AdvancedCopy(GetFirstInList(listID), newItem);
+            AddItem(key, it);
+            return it.GetByKey("ID");
         }
 
         public void RemoveItem(int list, Item it)
@@ -174,10 +184,12 @@ namespace pwApi.Readers
             Item removeItem;
             var arr = new Item[GetListById(list).Length-1];
             int i = 0;
+            bool deleted = false;
             foreach (var items in GetListById(list))
             {
-                if (items.GetByKey("ID") == it.GetByKey("ID"))
+                if (it == null || (items.GetByKey("ID") == it.GetByKey("ID")) && !deleted)
                 {
+                    deleted = true;
                     continue;
                 }
                 arr[i++] = items;
@@ -252,7 +264,8 @@ namespace pwApi.Readers
                 var currentKey = keys.ElementAt(i);
                 bw.Write(Items[currentKey].Length);
                 foreach (var item in Items[currentKey])
-                    item.Save(bw, _confList[i]);
+                    if(item != null)
+                        item.Save(bw, _confList[i]);
 
             }
             _confList.Insert(58, l58);

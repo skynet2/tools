@@ -33,6 +33,8 @@
             this.файлToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.откритьToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.сохранитьToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.инфоToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.конвертацияToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.listBox1 = new System.Windows.Forms.ListBox();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
@@ -54,7 +56,6 @@
             this.checkBox2 = new System.Windows.Forms.CheckBox();
             this.label3 = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.инфоToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
@@ -80,6 +81,7 @@
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.файлToolStripMenuItem,
+            this.конвертацияToolStripMenuItem,
             this.инфоToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
@@ -100,7 +102,7 @@
             // 
             this.откритьToolStripMenuItem.Name = "откритьToolStripMenuItem";
             this.откритьToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.откритьToolStripMenuItem.Text = "Открить";
+            this.откритьToolStripMenuItem.Text = "Открыть";
             this.откритьToolStripMenuItem.Click += new System.EventHandler(this.откритьToolStripMenuItem_Click);
             // 
             // сохранитьToolStripMenuItem
@@ -109,6 +111,20 @@
             this.сохранитьToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.сохранитьToolStripMenuItem.Text = "Сохранить";
             this.сохранитьToolStripMenuItem.Click += new System.EventHandler(this.сохранитьToolStripMenuItem_Click);
+            // 
+            // инфоToolStripMenuItem
+            // 
+            this.инфоToolStripMenuItem.Name = "инфоToolStripMenuItem";
+            this.инфоToolStripMenuItem.Size = new System.Drawing.Size(51, 20);
+            this.инфоToolStripMenuItem.Text = "Инфо";
+            this.инфоToolStripMenuItem.Click += new System.EventHandler(this.инфоToolStripMenuItem_Click);
+            // 
+            // конвертацияToolStripMenuItem
+            // 
+            this.конвертацияToolStripMenuItem.Name = "конвертацияToolStripMenuItem";
+            this.конвертацияToolStripMenuItem.Size = new System.Drawing.Size(90, 20);
+            this.конвертацияToolStripMenuItem.Text = "Конвертация";
+            this.конвертацияToolStripMenuItem.Click += new System.EventHandler(this.конвертацияToolStripMenuItem_Click);
             // 
             // listBox1
             // 
@@ -146,7 +162,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(6, 21);
+            this.label1.Location = new System.Drawing.Point(9, 16);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(35, 13);
             this.label1.TabIndex = 8;
@@ -309,13 +325,6 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Инфо";
             // 
-            // инфоToolStripMenuItem
-            // 
-            this.инфоToolStripMenuItem.Name = "инфоToolStripMenuItem";
-            this.инфоToolStripMenuItem.Size = new System.Drawing.Size(51, 20);
-            this.инфоToolStripMenuItem.Text = "Инфо";
-            this.инфоToolStripMenuItem.Click += new System.EventHandler(this.инфоToolStripMenuItem_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -383,6 +392,7 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.ToolStripMenuItem инфоToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem конвертацияToolStripMenuItem;
     }
 }
 

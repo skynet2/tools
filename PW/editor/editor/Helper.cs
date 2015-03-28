@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -71,8 +72,8 @@ namespace editor
             foreach (var item in _elReader.GetListById(70))
             {
                 for(int i = 1; i < 4; i++)
-                    if (Convert.ToInt32(item.GetByKey(string.Format("targets_{0}_id_to_make", i))) == id)
-                        ls.Add(string.Format("List : {0} ID : {1} Name : {2} Рецепт крафта : {3}",70,
+                    if (Convert.ToInt32(item.GetByKey(String.Format("targets_{0}_id_to_make", i))) == id)
+                        ls.Add(String.Format("List : {0} ID : {1} Name : {2} Рецепт крафта : {3}",70,
                             item.GetByKey("ID"),item.GetByKey("Name"),i));
             }
             return ls;
@@ -157,6 +158,57 @@ namespace editor
                 }
             }
             return new [] {x, y};
+        }
+
+        public static Dictionary<short, string> _versions = new Dictionary<short, string>();
+
+        public static void LoadElementConfigs()
+        {
+            foreach (var vv in Directory.GetFiles(Path.Combine(Directory.GetCurrentDirectory(), "configs"), "*v*.*", SearchOption.AllDirectories))
+            {
+                var name = Path.GetFileName(vv);
+                var key = Int16.Parse(Regex.Match(name, "v(\\d*)[.]").Groups[1].Value);
+                if (!Helper._versions.ContainsKey(key))
+                    Helper._versions.Add(key, vv);
+            }
+        }
+
+        public static Dictionary<string, HashSet<string>> Bonus4Page { get; set; }
+        public static Dictionary<string, HashSet<string>> Bonus7Page { get; set; }
+        public static Dictionary<string, HashSet<string>> Bonus10Page { get; set; }
+
+        public static string GetBonus(int list,string bonusid)
+        {
+            try
+            {
+                Dictionary<string, HashSet<string>> temp = null;
+                switch (list)
+                {
+                    case 4:
+                        temp = Helper.Bonus4Page;
+                        break;
+                    case 7:
+                        temp = Helper.Bonus7Page;
+                        break;
+                    case 10:
+                        temp = Helper.Bonus10Page;
+                        break;
+                }
+                foreach (var it in temp)
+                {
+                    foreach (var val in it.Value)
+                    {
+                        if (val == bonusid)
+                            return it.Key;
+                    }
+                }
+                return "";
+            }
+            catch (Exception)
+            {
+                return "";
+            }
+
         }
     }
 }

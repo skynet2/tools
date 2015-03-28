@@ -39,9 +39,11 @@ namespace pwApi.StructuresElement
                 switch (type._type)
                 {
                     case "wstring:":
+                     //   bw.Write(Encoding.Unicode.GetBytes(Values[i, 1]), 0, type.Size);
                         bw.Write(UtilsIO.GenerateArray(Encoding.Unicode.GetBytes(Values[i, 1]), type.Size));
                         break;
                     case "string:":
+                   //     bw.Write(Encoding.GetEncoding(936).GetBytes(Values[i, 1]),0,type.Size);
                         bw.Write(UtilsIO.GenerateArray(Encoding.GetEncoding(936).GetBytes(Values[i, 1]), type.Size));
                         break;
                     case "int32":
@@ -112,6 +114,7 @@ namespace pwApi.StructuresElement
                     case "wstring:":
                         vvv[i, 0] = tt.Name;
                         vvv[i, 1] = Encoding.Unicode.GetString(
+
                             br.ReadBytes(tt.Size));
                         break;
                     case "float":

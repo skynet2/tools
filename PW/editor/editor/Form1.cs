@@ -23,50 +23,16 @@ namespace editor
     {
         public static Dictionary<string, string> GetVals;
         public static GlobalSelector _globalSelector;
+        public static AddonSelector _AddonsSelector;
         public static SurfacesChanger _SurfacesChanger;
-        public static Dictionary<string, HashSet<string>> Bonus4Page { get; set; }
-        public static Dictionary<string, HashSet<string>> Bonus7Page { get; set; }
-        public static Dictionary<string, HashSet<string>> Bonus10Page { get; set; }
+
         public static void LoadDicts()
         {
-            Bonus4Page = LoadDict("bonuses4list.txt");
-            Bonus7Page = LoadDict("bonuses7list.txt");
-            Bonus10Page = LoadDict("bonuses10list.txt");
+            Helper.Bonus4Page = LoadDict("bonuses4list.txt");
+            Helper.Bonus7Page = LoadDict("bonuses7list.txt");
+            Helper.Bonus10Page = LoadDict("bonuses10list.txt");
         }
 
-        public static string GetBonus(int list,string bonusid)
-        {
-            try
-            {
-                Dictionary<string, HashSet<string>> temp = null;
-                switch (list)
-                {
-                    case 4:
-                        temp = Bonus4Page;
-                        break;
-                    case 7:
-                        temp = Bonus7Page;
-                        break;
-                    case 10:
-                        temp = Bonus10Page;
-                        break;
-                }
-                foreach (var it in temp)
-                {
-                    foreach (var val in it.Value)
-                    {
-                        if (val == bonusid)
-                            return it.Key;
-                    }
-                }
-                return "";
-            }
-            catch (Exception)
-            {
-                return "";
-            }
-
-        }
         public static Dictionary<string, HashSet<string>> LoadDict(string path)
         {
             var temp = new Dictionary<string, HashSet<string>>();
@@ -94,7 +60,7 @@ namespace editor
             var priva = dataGridView1.Columns["Test"];
             if (priva != null) priva.ReadOnly = true;
             var column = new DataGridViewTextBoxColumn() { Name = "Value", HeaderText = "Значения", Width = 165 };
-            var column1 = new DataGridViewTextBoxColumn() { Name = "Decrypt", HeaderText = "Разшифровка", Width = 100 };
+            var column1 = new DataGridViewTextBoxColumn() { Name = "Decrypt", HeaderText = "Расшифровка", Width = 100 };
             dataGridView1.Columns.Add(column);
             dataGridView1.Columns.Add(column1);
             Helper.LoadSurfaces();
@@ -104,6 +70,7 @@ namespace editor
             numericUpDown1.Minimum = 0;
             textBox3.MouseDoubleClick += textBox3_MouseDoubleClick;
             LoadDicts();
+            Helper.LoadElementConfigs();
             CheckForIllegalCrossThreadCalls = false;
         }
 
@@ -198,17 +165,9 @@ namespace editor
             Helper._elReader.AddItem((comboBox1.SelectedIndex + 1), newIt);
         }
 
-        private static Dictionary<short, string> _versions = new Dictionary<short, string>(); 
         private void откритьToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Page55._55Holders = null;
-            foreach (var vv in Directory.GetFiles(Path.Combine(Directory.GetCurrentDirectory(),"configs"),"*v*.*",SearchOption.AllDirectories))
-            {
-                var name = Path.GetFileName(vv);
-                var key = short.Parse(Regex.Match(name, "v(\\d*)[.]").Groups[1].Value);
-                if(!_versions.ContainsKey(key))
-                    _versions.Add(key,vv);
-            }
             OpenFileDialog diag = new OpenFileDialog();
             diag.ShowDialog();
             var res = diag.FileName;
@@ -220,12 +179,12 @@ namespace editor
                 version = br.ReadInt16();
                 br.Close();
             }
-            if (!_versions.ContainsKey(version))
+            if (!Helper._versions.ContainsKey(version))
             {
                 MessageBox.Show("Конфиг не найден. Версия елемента : " + version);
                 return;
             }
-            Helper._elReader = new ElementReader(_versions[version], res);
+            Helper._elReader = new ElementReader(Helper._versions[version], res);
             comboBox1.DataSource = new BindingSource(Helper._elReader.Items, null);
             comboBox1.DisplayMember = "Key";
         }
@@ -250,6 +209,8 @@ namespace editor
             var grid1 = new DataGridView() { Name = name, Width = (tabControl1.Width - 5), Height = tabControl1.Height };
             for (int i = 0; i < 3; i++)
                 grid1.Columns.Add(i.ToString(), i.ToString());
+            grid1.Columns[1].ReadOnly = true;
+            grid1.Columns[2].ReadOnly = true;
             return grid1;
         }
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -296,6 +257,7 @@ namespace editor
                 tabControl1.TabPages.Add(page2);
                 listBox1.SelectionMode = SelectionMode.MultiExtended;
             }
+            GetConnections();
             if (GetCurrentList() == 4 || GetCurrentList() == 7 || GetCurrentList() == 10)
             {
                 if (tabControl1.TabPages["Addons"] == null)                
@@ -323,7 +285,9 @@ namespace editor
                         continue;
                     if (((string) values[i, 0]).Contains("addons"))
                     {
-                        row.Cells[2].Value = GetBonus(GetCurrentList(),row.Cells[1].Value.ToString());
+                        row.Cells[2].Value = Helper.GetBonus(GetCurrentList(),row.Cells[1].Value.ToString());
+                        if (Convert.ToString(row.Cells[0].Value).Contains("id_addon"))
+                            row.Cells[1].Style.BackColor = Color.DarkOrange;
                         grid.Rows.Add(row);
                     } else if (((string) values[i, 0]).Contains("probability"))
                     {
@@ -337,7 +301,9 @@ namespace editor
                 }
                 grid.CellValueChanged += dataGridView1_CellValueChanged;
                 grid2.CellValueChanged += dataGridView1_CellValueChanged;
+                grid.CellDoubleClick += grid_CellDoubleClick;
                 dataGridView1.Rows.RemoveAt(0);
+
                 return;
             }
 
@@ -351,7 +317,7 @@ namespace editor
                 row.Cells[1].Value = cl.Values[i, 1];
                 if(cl.Values[i,0].Contains("character_combo"))
                 {
-                    row.Cells[1].Style.BackColor = Color.DarkOrange;
+                 //   row.Cells[1].Style.BackColor = Color.DarkOrange;
                 }
                 if (cl.Values[i, 0] == "id_sub_type")
                 {
@@ -364,7 +330,24 @@ namespace editor
             dataGridView1.CellValueChanged += dataGridView1_CellValueChanged;
             dataGridView1.CellDoubleClick += dataGridView1_CellDoubleClick;
             numericUpDown1.ValueChanged +=numericUpDown1_ValueChanged;
-            GetConnections();
+        //    GetConnections();
+        }
+
+        void grid_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.ColumnIndex == 0)
+                return;
+            var val = (string)((DataGridView) sender)[0, e.RowIndex].Value;
+            if (val.Contains("addons") && val.Contains("id_addon"))
+            {
+                if (_AddonsSelector == null)
+                    _AddonsSelector = new AddonSelector();
+                if (!AddonSelector.Opened)
+                {
+                    var dataGridViewCell = ((DataGridView)sender)[1, e.RowIndex];
+                    _AddonsSelector.Display(GetCurrentList(), ref dataGridViewCell);
+                }
+            }
         }
 
 
@@ -438,7 +421,7 @@ namespace editor
                 {
                     int list = GetCurrentList();
                     DataGridViewCell row = ((DataGridView)sender)[1, e.RowIndex];
-                    ((DataGridView)sender)[2, e.RowIndex].Value = GetBonus(list,row.Value.ToString());
+                    ((DataGridView)sender)[2, e.RowIndex].Value = Helper.GetBonus(list,row.Value.ToString());
                 }
             }
         }
@@ -492,6 +475,8 @@ namespace editor
         {
             FileDialog dd = new SaveFileDialog();
             dd.ShowDialog();
+            if (Helper._elReader == null || string.IsNullOrEmpty(dd.FileName))
+                return;
             if(File.Exists(dd.FileName))
                 File.Delete(dd.FileName);
             Helper._elReader.Save(dd.FileName);
@@ -501,6 +486,12 @@ namespace editor
         {
             var gg = new InfoForm();
             gg.Show();
+        }
+
+        private void конвертацияToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var i = new ElementConverter();
+            i.Show();
         }
     }
 }
