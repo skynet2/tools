@@ -467,6 +467,26 @@ private void button5_Click(object sender, EventArgs e)
             }
         }
 
+        private void button2_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (tabControl1.SelectedIndex == 0)
+                {
+                    _reader.Region.Regions.Remove((Region) listBox1.SelectedItem);
+                }
+                else
+                {
+                    _reader.Region.Transp.Remove((Transport)listBox1.SelectedItem);
+                }
+                RepaintList(true);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.InnerException.Message);
+            }
+        }
+
     }
 
     class Config
