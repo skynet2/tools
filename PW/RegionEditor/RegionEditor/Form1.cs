@@ -167,6 +167,9 @@ namespace RegionEditor
             }
             panel1.VerticalScroll.Value = 0;
             panel1.HorizontalScroll.Value = 0;
+            if (Convert.ToInt32(GetZ(p.z) - 70) > panel1.VerticalScroll.Maximum ||
+                Convert.ToInt32(GetX(p.x) - 60) > panel1.HorizontalScroll.Maximum )
+                return;
             panel1.VerticalScroll.Value = Convert.ToInt32(GetZ(p.z) - 70);
             panel1.HorizontalScroll.Value = Convert.ToInt32(GetX(p.x) - 60);
         }
@@ -233,8 +236,6 @@ namespace RegionEditor
 
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            try
-            {
                 if (listBox1.SelectedIndex < 0)
                     return;
                 if (pictureBox1.Image != null)
@@ -249,11 +250,6 @@ namespace RegionEditor
                 sourcebox.Text = it.m_idSrcInst.ToString();
                 destbox.Text = it.m_idInst.ToString();
                 lvlbox.Text = it.iLevelLmt.ToString();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.InnerException.Message);
-            }
         }
 
         private float GetX(float currX)
@@ -328,6 +324,9 @@ namespace RegionEditor
                 return;
             panel1.VerticalScroll.Value = 0;
             panel1.HorizontalScroll.Value = 0;
+            if (Convert.ToInt32(GetZ(last.z) - 70) > panel1.VerticalScroll.Maximum ||
+    Convert.ToInt32(GetX(last.x) - 60) > panel1.HorizontalScroll.Maximum)
+                return;
             panel1.VerticalScroll.Value = Convert.ToInt32(GetZ(last.z) - 70);
             panel1.HorizontalScroll.Value = Convert.ToInt32(GetX(last.x) - 60);
         }
