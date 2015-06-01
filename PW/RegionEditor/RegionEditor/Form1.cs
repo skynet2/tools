@@ -398,6 +398,8 @@ private void button5_Click(object sender, EventArgs e)
         }
         private void Form1_Load(object sender, EventArgs e)
         {
+            FormBorderStyle = FormBorderStyle.Fixed3D;
+            MaximizeBox = false;
             _configs = JsonConvert.DeserializeObject<List<Config>>(File.ReadAllText("coord.json", Encoding.UTF8));
             comboBox2.MouseClick += comboBox2_MouseClick;
             comboBox1.DataSource = _configs;

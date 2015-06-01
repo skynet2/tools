@@ -57,8 +57,8 @@
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.comboBox3 = new System.Windows.Forms.ComboBox();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
-            this.button4 = new System.Windows.Forms.Button();
             this.button8 = new System.Windows.Forms.Button();
+            this.button4 = new System.Windows.Forms.Button();
             this.button9 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.tabControl1.SuspendLayout();
@@ -346,17 +346,7 @@
             this.groupBox6.Size = new System.Drawing.Size(986, 53);
             this.groupBox6.TabIndex = 17;
             this.groupBox6.TabStop = false;
-            this.groupBox6.Text = "groupBox6";
-            // 
-            // button4
-            // 
-            this.button4.Location = new System.Drawing.Point(10, 20);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(492, 23);
-            this.button4.TabIndex = 0;
-            this.button4.Text = "Save";
-            this.button4.UseVisualStyleBackColor = true;
-            this.button4.Click += new System.EventHandler(this.button4_Click);
+            this.groupBox6.Text = "Сохранение";
             // 
             // button8
             // 
@@ -367,6 +357,16 @@
             this.button8.Text = "Save (Region.clt)";
             this.button8.UseVisualStyleBackColor = true;
             this.button8.Click += new System.EventHandler(this.button8_Click);
+            // 
+            // button4
+            // 
+            this.button4.Location = new System.Drawing.Point(10, 20);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(492, 23);
+            this.button4.TabIndex = 0;
+            this.button4.Text = "Save";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
             // button9
             // 
