@@ -33,6 +33,26 @@ namespace editor
             Helper.Bonus10Page = LoadDict("bonuses10list.txt");
         }
 
+        public void LangLoade()
+        {
+            LangLoader.Default();
+            var it = (ToolStripMenuItem) menuStrip1.Items["langToolStripMenuItem"];
+            foreach (var file in Directory.GetFiles(Path.Combine(Directory.GetCurrentDirectory(),"languages")))
+            {
+                var item = new ToolStripMenuItem();
+                item.Name = Path.GetFileName(file);
+                item.Text = Path.GetFileName(file);
+                item.Click += item_Click;
+                it.DropDownItems.Add(item);
+            }
+                
+        }
+
+        void item_Click(object sender, EventArgs e)
+        {
+            var it = (ToolStripMenuItem) sender;
+
+        }
         public static Dictionary<string, HashSet<string>> LoadDict(string path)
         {
             var temp = new Dictionary<string, HashSet<string>>();
@@ -60,8 +80,8 @@ namespace editor
             dataGridView1.Columns.Add(column0);
             var priva = dataGridView1.Columns["Test"];
             if (priva != null) priva.ReadOnly = true;
-            var column = new DataGridViewTextBoxColumn() { Name = "Value", HeaderText = "Значения", Width = 165};
-            var column1 = new DataGridViewTextBoxColumn() { Name = "Decrypt", HeaderText = "Расшифровка", Width = 100};
+            var column = new DataGridViewTextBoxColumn() { Name = "Value", HeaderText = LangLoader.GetLangItem("GridValues"), Width = 165 };
+            var column1 = new DataGridViewTextBoxColumn() { Name = "Decrypt", HeaderText = LangLoader.GetLangItem("GridDecrypt"), Width = 100 };
             dataGridView1.Columns.Add(column);
             dataGridView1.Columns.Add(column1);
             Helper.LoadSurfaces();
@@ -73,6 +93,7 @@ namespace editor
             LoadDicts();
             Helper.LoadElementConfigs();
             CheckForIllegalCrossThreadCalls = false;
+            LangLoade();
         }
 
 
@@ -95,10 +116,8 @@ namespace editor
             if(e.Button == MouseButtons.Right)
             {
                 ContextMenuStrip m = new ContextMenuStrip();
-                m.Items.Add("Удалить");
-                m.Items.Add("Клонировать");
-                m.Items.Add("Экспорт");
-                m.Items.Add("Импорт");
+                for (int i = 0; i < 3; i++)
+                    m.Items.Add(LangLoader.GetLangItem("ContextMenu" + i));
                 m.Show(listBox1,new Point(e.X, e.Y));
                 m.ItemClicked += m_ItemClicked;
             }
@@ -630,6 +649,18 @@ namespace editor
         {
             var i = new ElementConverter();
             i.Show();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            for(int i = 0; i <= 3; i++ )
+            menuStrip1.Items[i].Text = LangLoader.GetLangItem("MenuItem"+(i+1));
+
+            var it = (ToolStripMenuItem) menuStrip1.Items[0];
+            for (int i = 0; i < it.DropDownItems.Count; i++)
+            {
+                it.DropDownItems[i].Text = LangLoader.GetLangItem("Menu1SubItem" + (i + 1));
+            }
         }
     }
 }
