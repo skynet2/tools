@@ -1,0 +1,9 @@
+[submodule "PW/pwApi"]
+	path = PW/pwApi
+	url = ../pwApi
+[submodule "PW/editor/pwApi"]
+	path = PW/editor/pwApi
+	url = ../pwApi
+[submodule "PW/RegionEditor/pwApi"]
+	path = PW/RegionEditor/pwApi
+	url = ../pwApi
