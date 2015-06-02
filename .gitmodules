@@ -1,9 +1,9 @@
 [submodule "PW/pwApi"]
 	path = PW/pwApi
-	url = ../pwApi
+	url = https://github.com/skynet2/pwAPI
 [submodule "PW/editor/pwApi"]
 	path = PW/editor/pwApi
-	url = ../pwApi
+	url = https://github.com/skynet2/pwAPI
 [submodule "PW/RegionEditor/pwApi"]
 	path = PW/RegionEditor/pwApi
-	url = ../pwApi
+	url = https://github.com/skynet2/pwAPI
